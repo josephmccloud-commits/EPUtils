@@ -6,6 +6,10 @@ on:
       - 'v*'
   workflow_dispatch:
 
+# Fixes the Node.js warning by forcing the runner to upgrade Javascript steps
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,17 +19,17 @@ jobs:
     - name: Checkout repository code
       uses: actions/checkout@v4
 
-    # 2. Set up the exact Node environment BEPP needs
+    # 2. Set up a modern Node environment
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 22
+        node-version: 24
 
     # 3. Export the Chrome secret key as an environment variable for BEPP
     - name: Export Chrome Key
       run: echo "${{ secrets.CHROME_PRIVATE_KEY }}" > chrome.pem
 
-    # 4. Run BEPP natively using its strict file parameter rule
+    # 4. Run BEPP natively using its configuration file rule
     - name: Compile Extension Formats
       uses: pigeonposse/bepp@v1
       with:
