@@ -1,0 +1,11 @@
+{
+  "name": "ep-utilities",
+  "source": ".",
+  "chrome": {
+    "zip": true,
+    "crx": true
+  },
+  "firefox": {
+    "xpi": true
+  }
+}
