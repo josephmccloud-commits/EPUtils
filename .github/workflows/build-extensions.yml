@@ -3,33 +3,43 @@ name: Compile Browser Extensions
 on:
   push:
     tags:
-      - 'v*' # Triggers the build automatically whenever you push a version tag (e.g. v3.3)
-  workflow_dispatch: # Allows you to manually click "Run workflow" from the GitHub UI for testing
+      - 'v*'
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Pull down the repository code
+    # 1. Fetch your code
     - name: Checkout repository code
       uses: actions/checkout@v4
 
-    # 2. Compile .crx, .xpi, and source .zip via BEPP
-    - name: Compile Extension Formats
-      uses: pigeonposse/bepp@1.3.17
+    # 2. Set up the exact Node environment BEPP needs
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
       with:
-        source: '.' 
-        chrome-key: ${{ secrets.CHROME_PRIVATE_KEY }}
-        output-name: 'ep-utilities'
+        node-version: 22
 
-    # 3. Create the GitHub Release and upload the generated assets
+    # 3. Export the Chrome secret key as an environment variable for BEPP
+    - name: Export Chrome Key
+      run: echo "${{ secrets.CHROME_PRIVATE_KEY }}" > chrome.pem
+
+    # 4. Run BEPP natively using its strict file parameter rule
+    - name: Compile Extension Formats
+      uses: pigeonposse/bepp@v1
+      with:
+        file: './bepp.config.json'
+      env:
+        BEPP_CHROME_KEY: './chrome.pem'
+
+    # 5. Create the GitHub Release and grab the files from BEPP's default output directory
     - name: Create GitHub Release and Upload Bundles
       uses: softprops/action-gh-release@v2
       with:
         files: |
-          dist/ep-utilities.crx
-          dist/ep-utilities.xpi
-          dist/ep-utilities.zip
+          .bepp/ep-utilities.crx
+          .bepp/ep-utilities.xpi
+          .bepp/ep-utilities.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
