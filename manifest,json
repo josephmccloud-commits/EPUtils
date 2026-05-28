@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Education Perfect Utilities",
+  "version": "3.3",
+  "description": "Made by Joe",
+  "permissions": [],
+  "content_scripts": [
+    {
+      "matches": ["https://app.educationperfect.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_end",
+      "world": "MAIN"
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "ep-helper-extension@yoursandbox.local"
+    }
+  }
+}
